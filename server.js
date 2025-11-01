@@ -22,7 +22,7 @@ app.use('/', express.static(path.join(__dirname)));
 
 // Connect to MongoDB
 const mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/audiobooks';
-mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(mongoUri)
   .then(() => {
     console.log('MongoDB conectado');
     // inicializa GridFSBucket e anexa ao app locals
@@ -39,6 +39,10 @@ mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
     app.use('/api/audio', audioRouter);
     // Inicia o servidor somente depois que o DB e rotas estiverem prontas
     const port = process.env.PORT || 3000;
-    app.listen(port, () => console.log(`Servidor rodando em http://localhost:${port}`));
+    const host = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
+    app.listen(port, host, () => {
+      console.log(`Servidor rodando em http://${host}:${port}`);
+      console.log('Ambiente:', process.env.NODE_ENV);
+    });
   })
   .catch(err => console.error('Erro ao conectar MongoDB', err));
