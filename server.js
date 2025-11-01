@@ -11,10 +11,19 @@ const audioRouter = require('./routes/audio');
 const app = express();
 
 // Configuração do CORS
+const allowedOrigins = process.env.NODE_ENV === 'production'
+  ? ['https://08gabrielluis.github.io'] // frontend hospedado no GitHub Pages
+  : ['http://localhost:3000', 'http://127.0.0.1:3000'];
+
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production'
-    ? ['https://seu-frontend.vercel.app'] // Substitua com a URL do seu frontend
-    : 'http://localhost:3000',
+  origin: function (origin, callback) {
+    // permitir requisições sem origin (curl, postman, servidores)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      return callback(null, true);
+    }
+    return callback(new Error('CORS policy: origin not allowed'));
+  },
   optionsSuccessStatus: 200
 };
 
