@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ override: true });
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -9,7 +9,16 @@ const uploadRouter = require('./routes/upload');
 const audioRouter = require('./routes/audio');
 
 const app = express();
-app.use(cors());
+
+// Configuração do CORS
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production'
+    ? ['https://seu-frontend.vercel.app'] // Substitua com a URL do seu frontend
+    : 'http://localhost:3000',
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Servir assets estáticos do seu projeto
